@@ -23,6 +23,13 @@ int main()
                 }
             }
         }
+
+		//Rendering code Color sky blue
+		window->clear(sf::Color(135, 206, 235)); // Sky blue color
+
+		//Drawing code would go here
+
+		window->display();
     }
 
     delete window;
