@@ -3,9 +3,10 @@
 
 int main()
 {
-    unsigned int width = 800;
-    unsigned int height = 640;
+    unsigned int width = 1200;
+    unsigned int height = 960;
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ width, height }), "FliMo");
+	window->setFramerateLimit(60);
 
     while (window->isOpen())
     {
@@ -24,7 +25,7 @@ int main()
             }
         }
 
-		//Rendering code Color sky blue
+		//Rendering code
 		window->clear(sf::Color(135, 206, 235)); // Sky blue color
 
 		//Drawing code would go here
