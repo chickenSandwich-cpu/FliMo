@@ -8,6 +8,16 @@ int main()
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ width, height }), "FliMo");
 	window->setFramerateLimit(60);
 
+	sf::Texture texture;
+    if (!texture.loadFromFile("assets/card_back.png"))
+    {
+        std::cerr << "Failed to load texture!" << std::endl;
+        return -1;
+	}
+	sf::Sprite sprite(texture);
+    sprite.setPosition({ (width - texture.getSize().x) / 2.f, (height - texture.getSize().y) / 2.f });
+    sprite.setScale({ 4.0f, 4.0f }); // Scale the sprite to make it larger
+
     while (window->isOpen())
     {
         while (const std::optional event = window->pollEvent())
@@ -29,6 +39,7 @@ int main()
 		window->clear(sf::Color(135, 206, 235)); // Sky blue color
 
 		//Drawing code would go here
+		window->draw(sprite);
 
 		window->display();
     }
