@@ -3,9 +3,9 @@
 
 int main()
 {
-    unsigned int width = 1200;
-    unsigned int height = 960;
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ width, height }), "FliMo");
+    unsigned int WIDTH = 1200;
+    unsigned int HEIGHT = 960;
+    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
 	window->setFramerateLimit(60);
 
 	sf::Texture backgroundTexture;
@@ -16,8 +16,8 @@ int main()
     }
     sf::Sprite backgroundSprite(backgroundTexture);
 	//Load the background the size of the window
-	backgroundSprite.setScale({ static_cast<float>(width) / backgroundTexture.getSize().x,
-        static_cast<float>(height) / backgroundTexture.getSize().y });
+	backgroundSprite.setScale({ static_cast<float>(WIDTH) / backgroundTexture.getSize().x,
+        static_cast<float>(HEIGHT) / backgroundTexture.getSize().y });
 
 	sf::Texture cardBackTexture;
     if (!cardBackTexture.loadFromFile("assets/card_back.png"))
@@ -25,9 +25,9 @@ int main()
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
 	}
-	sf::Sprite sprite(cardBackTexture);
-    sprite.setPosition({ (width - cardBackTexture.getSize().x) / 2.f, (height - cardBackTexture.getSize().y) / 2.f });
-    sprite.setScale({ 4.0f, 4.0f }); //Scale the sprite to make it larger
+	sf::Sprite cardBackSprite(cardBackTexture);
+    cardBackSprite.setPosition({ (WIDTH - cardBackTexture.getSize().x) / 2.f, (HEIGHT - cardBackTexture.getSize().y) / 2.f });
+    cardBackSprite.setScale({ 4.0f, 4.0f }); //Scale the sprite to make it larger
 
     while (window->isOpen())
     {
@@ -44,6 +44,11 @@ int main()
                     window->close();
                 }
             }
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            {
+                std::cout << "debug\n";
+			}
         }
 
 		//Rendering code
@@ -51,7 +56,7 @@ int main()
 
 		//Drawing code would go here
 		window->draw(backgroundSprite);
-		window->draw(sprite);
+		window->draw(cardBackSprite);
 
 		window->display();
     }
