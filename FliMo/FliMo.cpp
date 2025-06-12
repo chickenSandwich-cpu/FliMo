@@ -8,6 +8,8 @@ int main()
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
 	window->setFramerateLimit(60);
 
+	bool isPressed = false;
+
 	sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("assets/paper_background.png"))
     {
@@ -47,8 +49,16 @@ int main()
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {
-                std::cout << "debug\n";
-			}
+                if (!isPressed)
+                {
+                    std::cout << "Debug" << std::endl;
+                }
+                isPressed = true;
+            }
+            else
+            {
+                isPressed = false;
+            }
         }
 
 		//Rendering code
