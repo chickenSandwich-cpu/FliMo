@@ -10,6 +10,8 @@ int main()
 
 	bool isPressed = false;
 
+	bool isFlipped = false;
+
 	sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("assets/paper_background.png"))
     {
@@ -51,6 +53,15 @@ int main()
             {
                 if (!isPressed)
                 {
+					sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
+					sf::Vector2f worldPos = window->mapPixelToCoords(mousePos);
+
+                    if (cardBackSprite.getGlobalBounds().contains(worldPos))
+                    {
+                        isFlipped = !isFlipped;
+                        std::cout << "Card flipped: " << (isFlipped ? "True" : "False") << std::endl;
+					}
+
                     std::cout << "Debug" << std::endl;
                 }
                 isPressed = true;
