@@ -42,6 +42,12 @@ int main()
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
 	}
+	sf::Texture cardFrontTextureGrapes;
+    if (!cardFrontTextureGrapes.loadFromFile("assets/card_grapes.png"))
+    {
+        std::cerr << "Failed to load texture!" << std::endl;
+        return -1;
+    }
 
     while (window->isOpen())
     {
@@ -81,6 +87,20 @@ int main()
 						}
 						std::cout << "Card flipped!" << std::endl;
 					}
+                    else if (cardBackSprite2.getGlobalBounds().contains(worldPos))
+                    {
+                        isFlipped = !isFlipped;
+                        if (isFlipped)
+                        {
+                            cardBackSprite2.setTexture(cardFrontTextureGrapes);
+                            cardBackSprite2.setScale({ 4.0f, 4.0f }); //Ensure the front texture is also scaled
+                        }
+                        else
+                        {
+                            cardBackSprite2.setTexture(cardBackTexture);
+                            cardBackSprite2.setScale({ 4.0f, 4.0f }); //Reset to the back texture scale
+                        }
+                    }
                     std::cout << "Debug" << std::endl;
                 }
                 isPressed = true;
