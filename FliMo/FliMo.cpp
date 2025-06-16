@@ -33,6 +33,13 @@ int main()
     cardBackSprite.setPosition({ (WIDTH - cardBackTexture.getSize().x) / 2.f, (HEIGHT - cardBackTexture.getSize().y) / 2.f });
     cardBackSprite.setScale({ 4.0f, 4.0f }); //Scale the sprite to make it larger
 
+	sf::Texture cardFrontTextureTomato;
+    if (!cardFrontTextureTomato.loadFromFile("assets/card_tomato.png"))
+    {
+        std::cerr << "Failed to load texture!" << std::endl;
+        return -1;
+	}
+
     while (window->isOpen())
     {
         while (const std::optional event = window->pollEvent())
@@ -59,9 +66,18 @@ int main()
                     if (cardBackSprite.getGlobalBounds().contains(worldPos))
                     {
                         isFlipped = !isFlipped;
-                        std::cout << "Card flipped: " << (isFlipped ? "True" : "False") << std::endl;
+                        if (isFlipped)
+                        {
+                            cardBackSprite.setTexture(cardFrontTextureTomato);
+                            cardBackSprite.setScale({ 4.0f, 4.0f }); //Ensure the front texture is also scaled
+                        }
+                        else
+                        {
+                            cardBackSprite.setTexture(cardBackTexture);
+                            cardBackSprite.setScale({ 4.0f, 4.0f }); //Reset to the back texture scale
+						}
+						std::cout << "Card flipped!" << std::endl;
 					}
-
                     std::cout << "Debug" << std::endl;
                 }
                 isPressed = true;
