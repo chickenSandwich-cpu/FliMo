@@ -1,16 +1,49 @@
 #include <iostream>
+#include <vector>
 #include <SFML/Graphics.hpp>
+
+class Card
+{
+public:
+    sf::Sprite sprite;
+    sf::Texture frontTexture;
+    bool isFlipped = false;
+    int id = 0; //Unique identifier for the card
+
+    // Parameterized constructor to initialize the card with a front texture and ID  
+    Card(const sf::Texture& frontTexture, int id)
+        : sprite(frontTexture), frontTexture(frontTexture), id(id)
+    {
+        // No need to set the texture again, already set in initializer list
+    }
+
+    void Flip(const sf::Texture& backTexture)
+    {
+        isFlipped = !isFlipped;
+        if (isFlipped)
+        {
+            sprite.setTexture(frontTexture);
+            sprite.setScale({ 4.0f, 4.0f }); //Scale the front texture
+        }
+        else
+        {
+            sprite.setTexture(backTexture);
+            sprite.setScale({ 4.0f, 4.0f }); //Reset to the back texture scale
+        }
+    }
+};
 
 int main()
 {
     unsigned int WIDTH = 1200;
     unsigned int HEIGHT = 960;
+    const int ROWS = 4;
+    const int COLUMNS = 4;
+	float cardSpacing = WIDTH / 9.0f; //Spacing between cards
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
 	window->setFramerateLimit(60);
 
 	bool isPressed = false;
-
-	bool isFlipped = false;
 
 	sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("assets/paper_background.png"))
@@ -29,12 +62,6 @@ int main()
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
 	}
-	sf::Sprite cardBackSprite1(cardBackTexture);
-    cardBackSprite1.setPosition({ (WIDTH / 9.0f), (cardBackTexture.getSize().y * 4.0f) });
-    cardBackSprite1.setScale({ 4.0f, 4.0f }); //Scale the sprite to make it larger
-	sf::Sprite cardBackSprite2(cardBackTexture);
-    cardBackSprite2.setPosition({ (WIDTH / 9.0f * 3.0f), (cardBackTexture.getSize().y * 4.0f) });
-	cardBackSprite2.setScale({ 4.0f, 4.0f }); //Scale the sprite to make it larger
 
 	sf::Texture cardFrontTextureTomato;
     if (!cardFrontTextureTomato.loadFromFile("assets/card_tomato.png"))
@@ -47,6 +74,25 @@ int main()
     {
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
+    }
+
+    std::vector<Card> cards;
+	int textureId = 0;
+
+	float cardWidth = cardBackTexture.getSize().x * 4.0f;
+    float cardHeight = cardBackTexture.getSize().y * 4.0f; 
+	float startX = (WIDTH - (COLUMNS * cardWidth + (COLUMNS - 1) * cardSpacing)) / 2.0f;
+    float startY = (HEIGHT - (ROWS * cardHeight + (ROWS - 1) * cardSpacing)) / 2.0f;
+
+	//std::vector<sf::Texture> cardFrontTextures = { cardFrontTextureTomato, cardFrontTextureGrapes };
+    for (int row = 0; row < ROWS; ++row)
+    {
+        for (int column = 0; column < COLUMNS; ++column)
+        {
+            const sf::Texture& frontTexture = (textureId % 2 == 0) ? cardFrontTextureTomato : cardFrontTextureGrapes;
+            cards.emplace_back(frontTexture, textureId);
+            ++textureId;
+        }
     }
 
     while (window->isOpen())
@@ -72,33 +118,11 @@ int main()
 					sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
 					sf::Vector2f worldPos = window->mapPixelToCoords(mousePos);
 
-                    if (cardBackSprite1.getGlobalBounds().contains(worldPos))
-                    {
-                        isFlipped = !isFlipped;
-                        if (isFlipped)
-                        {
-                            cardBackSprite1.setTexture(cardFrontTextureTomato);
-                            cardBackSprite1.setScale({ 4.0f, 4.0f }); //Ensure the front texture is also scaled
-                        }
-                        else
-                        {
-                            cardBackSprite1.setTexture(cardBackTexture);
-                            cardBackSprite1.setScale({ 4.0f, 4.0f }); //Reset to the back texture scale
-						}
-						std::cout << "Card flipped!" << std::endl;
-					}
-                    else if (cardBackSprite2.getGlobalBounds().contains(worldPos))
-                    {
-                        isFlipped = !isFlipped;
-                        if (isFlipped)
-                        {
-                            cardBackSprite2.setTexture(cardFrontTextureGrapes);
-                            cardBackSprite2.setScale({ 4.0f, 4.0f }); //Ensure the front texture is also scaled
-                        }
-                        else
-                        {
-                            cardBackSprite2.setTexture(cardBackTexture);
-                            cardBackSprite2.setScale({ 4.0f, 4.0f }); //Reset to the back texture scale
+                    for (auto& card : cards) {
+                        if (card.sprite.getGlobalBounds().contains(worldPos)) {
+                            card.Flip(cardBackTexture);
+                            std::cout << "Card flipped!" << std::endl;
+                            break;
                         }
                     }
                     std::cout << "Debug" << std::endl;
@@ -116,8 +140,9 @@ int main()
 
 		//Drawing code would go here
 		window->draw(backgroundSprite);
-		window->draw(cardBackSprite1);
-        window->draw(cardBackSprite2);
+        for (const auto& card : cards) {
+            window->draw(card.sprite);
+        }
 
 		window->display();
     }
