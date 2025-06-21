@@ -11,8 +11,8 @@ public:
     int id = 0; //Unique identifier for the card
 
     // Parameterized constructor to initialize the card with a front texture and ID  
-    Card(const sf::Texture& frontTexture, int id)
-        : sprite(frontTexture), frontTexture(frontTexture), id(id)
+    Card(const sf::Texture& _backTexture, const sf::Texture& _frontTexture, int _id)
+        : sprite(_backTexture), frontTexture(_frontTexture), id(_id)
     {
         // No need to set the texture again, already set in initializer list
     }
@@ -23,11 +23,13 @@ public:
         if (isFlipped)
         {
             sprite.setTexture(frontTexture);
+			sprite.setPosition({ 210.0f, 120.0f });
             sprite.setScale({ 4.0f, 4.0f }); //Scale the front texture
         }
         else
         {
             sprite.setTexture(backTexture);
+            sprite.setPosition({ 120.0f, 210.0f });
             sprite.setScale({ 4.0f, 4.0f }); //Reset to the back texture scale
         }
     }
@@ -79,10 +81,10 @@ int main()
     std::vector<Card> cards;
 	int textureId = 0;
 
-	float cardWidth = cardBackTexture.getSize().x * 4.0f;
-    float cardHeight = cardBackTexture.getSize().y * 4.0f; 
-	float startX = (WIDTH - (COLUMNS * cardWidth + (COLUMNS - 1) * cardSpacing)) / 2.0f;
-    float startY = (HEIGHT - (ROWS * cardHeight + (ROWS - 1) * cardSpacing)) / 2.0f;
+	//float cardWidth = cardBackTexture.getSize().x * 4.0f;
+    //float cardHeight = cardBackTexture.getSize().y * 4.0f; 
+	//float startX = (WIDTH - (COLUMNS * cardWidth + (COLUMNS - 1) * cardSpacing)) / 2.0f;
+    //float startY = (HEIGHT - (ROWS * cardHeight + (ROWS - 1) * cardSpacing)) / 2.0f;
 
 	//std::vector<sf::Texture> cardFrontTextures = { cardFrontTextureTomato, cardFrontTextureGrapes };
     for (int row = 0; row < ROWS; ++row)
@@ -90,7 +92,7 @@ int main()
         for (int column = 0; column < COLUMNS; ++column)
         {
             const sf::Texture& frontTexture = (textureId % 2 == 0) ? cardFrontTextureTomato : cardFrontTextureGrapes;
-            cards.emplace_back(frontTexture, textureId);
+            cards.emplace_back(cardBackTexture, frontTexture, textureId);
             ++textureId;
         }
     }
@@ -140,6 +142,7 @@ int main()
 
 		//Drawing code would go here
 		window->draw(backgroundSprite);
+
         for (const auto& card : cards) {
             window->draw(card.sprite);
         }
