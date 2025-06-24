@@ -56,8 +56,7 @@ int main()
 	//Load the background the size of the window
 	backgroundSprite.setScale({ static_cast<float>(WIDTH) / backgroundTexture.getSize().x,
         static_cast<float>(HEIGHT) / backgroundTexture.getSize().y });
-
-	sf::Texture cardBackTexture;
+    sf::Texture cardBackTexture;
     if (!cardBackTexture.loadFromFile("assets/card_back.png"))
     {
         std::cerr << "Failed to load texture!" << std::endl;
@@ -82,16 +81,11 @@ int main()
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
 	}
+	std::vector<sf::Texture> cardFrontTextures = { cardFrontTextureTomato, cardFrontTextureGrapes, cardFrontTextureApple };
 
     std::vector<Card> cards;
 	int textureId = 0;
 
-	//float cardWidth = cardBackTexture.getSize().x * 4.0f;
-    //float cardHeight = cardBackTexture.getSize().y * 4.0f; 
-	//float startX = (WIDTH - (COLUMNS * cardWidth + (COLUMNS - 1) * cardSpacing)) / 2.0f;
-    //float startY = (HEIGHT - (ROWS * cardHeight + (ROWS - 1) * cardSpacing)) / 2.0f;
-
-	//std::vector<sf::Texture> cardFrontTextures = { cardFrontTextureTomato, cardFrontTextureGrapes };
     for (int row = 0; row < ROWS; ++row)
     {
         for (int column = 0; column < COLUMNS; ++column)
