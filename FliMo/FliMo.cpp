@@ -63,25 +63,26 @@ int main()
         return -1;
 	}
 
-	sf::Texture cardFrontTextureTomato;
-    if (!cardFrontTextureTomato.loadFromFile("assets/card_tomato.png"))
+    std::vector<sf::Texture> cardFrontTextures(8);
+    const char* textureFiles[8] = {
+        "assets/card_tomato.png",
+        "assets/card_grapes.png",
+        "assets/card_apple.png",
+        "assets/card_banana.png",
+        "assets/card_orange.png",
+        "assets/card_hippo.png",
+        "assets/card_penguin.png",
+        "assets/card_frog.png"
+    };
+
+    for (int i = 0; i < 8; ++i)
     {
-        std::cerr << "Failed to load texture!" << std::endl;
-        return -1;
+        if (!cardFrontTextures[i].loadFromFile(textureFiles[i]))
+        {
+            std::cerr << "Failed to load texture: " << textureFiles[i] << std::endl;
+            return -1;
+        }
 	}
-	sf::Texture cardFrontTextureGrapes;
-    if (!cardFrontTextureGrapes.loadFromFile("assets/card_grapes.png"))
-    {
-        std::cerr << "Failed to load texture!" << std::endl;
-        return -1;
-    }
-	sf::Texture cardFrontTextureApple;
-    if (!cardFrontTextureApple.loadFromFile("assets/card_apple.png"))
-    {
-        std::cerr << "Failed to load texture!" << std::endl;
-        return -1;
-	}
-	std::vector<sf::Texture> cardFrontTextures = { cardFrontTextureTomato, cardFrontTextureGrapes, cardFrontTextureApple };
 
     std::vector<Card> cards;
 	int textureId = 0;
@@ -90,7 +91,7 @@ int main()
     {
         for (int column = 0; column < COLUMNS; ++column)
         {
-            const sf::Texture& frontTexture = (textureId % 2 == 0) ? cardFrontTextureTomato : cardFrontTextureGrapes;
+			const sf::Texture& frontTexture = cardFrontTextures[textureId % cardFrontTextures.size()];
             cards.emplace_back(cardBackTexture, frontTexture, textureId);
 
             // Calculate position for this card
