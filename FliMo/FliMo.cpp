@@ -23,13 +23,11 @@ public:
         if (isFlipped)
         {
             sprite.setTexture(frontTexture);
-			sprite.setPosition({ 210.0f, 120.0f });
             sprite.setScale({ 4.0f, 4.0f }); //Scale the front texture
         }
         else
         {
             sprite.setTexture(backTexture);
-            sprite.setPosition({ 120.0f, 210.0f });
             sprite.setScale({ 4.0f, 4.0f }); //Reset to the back texture scale
         }
     }
@@ -41,7 +39,8 @@ int main()
     unsigned int HEIGHT = 960;
     const int ROWS = 4;
     const int COLUMNS = 4;
-	float cardSpacing = WIDTH / 9.0f; //Spacing between cards
+	float cardSpacingWidth = WIDTH / 9.0f; //Spacing between cards
+	float cardSpacingHeight = HEIGHT / 9.0f; //Spacing between cards
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
 	window->setFramerateLimit(60);
 
@@ -77,6 +76,12 @@ int main()
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
     }
+	sf::Texture cardFrontTextureApple;
+    if (!cardFrontTextureApple.loadFromFile("assets/card_apple.png"))
+    {
+        std::cerr << "Failed to load texture!" << std::endl;
+        return -1;
+	}
 
     std::vector<Card> cards;
 	int textureId = 0;
@@ -93,6 +98,18 @@ int main()
         {
             const sf::Texture& frontTexture = (textureId % 2 == 0) ? cardFrontTextureTomato : cardFrontTextureGrapes;
             cards.emplace_back(cardBackTexture, frontTexture, textureId);
+
+            // Calculate position for this card
+            float cardWidth = cardBackTexture.getSize().x * 4.0f;
+            float cardHeight = cardBackTexture.getSize().y * 4.0f;
+            float startX = WIDTH / 9.0f;
+			float startY = HEIGHT / 9.0f;
+            float x = startX + column * (cardWidth + cardSpacingWidth);
+            float y = startY + row * (cardHeight + cardSpacingHeight);
+
+            cards.back().sprite.setPosition({ x, y });
+            cards.back().sprite.setScale({ 4.0f, 4.0f });
+
             ++textureId;
         }
     }
