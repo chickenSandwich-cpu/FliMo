@@ -39,8 +39,8 @@ int main()
     unsigned int HEIGHT = 960;
     const int ROWS = 4;
     const int COLUMNS = 4;
-	float cardSpacingWidth = WIDTH / 9.0f; //Spacing between cards
-	float cardSpacingHeight = HEIGHT / 9.0f; //Spacing between cards
+	float cardSpacingWidth = (WIDTH - 32.0f * 4.0f * 4.0f) / 5.0f; //Spacing between cards
+    float cardSpacingHeight = (HEIGHT - 32.0f * 4.0f * 4.0f) / 5.0f;  //Spacing between cards
     sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
 	window->setFramerateLimit(60);
 
@@ -97,8 +97,8 @@ int main()
             // Calculate position for this card
             float cardWidth = cardBackTexture.getSize().x * 4.0f;
             float cardHeight = cardBackTexture.getSize().y * 4.0f;
-            float startX = WIDTH / 9.0f;
-			float startY = HEIGHT / 9.0f;
+            float startX = (WIDTH - 32.0f * 4.0f * 4.0f) / 5.0f;
+			float startY = (HEIGHT - 32.0f * 4.0f * 4.0f) / 5.0f;
             float x = startX + column * (cardWidth + cardSpacingWidth);
             float y = startY + row * (cardHeight + cardSpacingHeight);
 
