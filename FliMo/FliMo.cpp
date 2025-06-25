@@ -41,8 +41,11 @@ int main()
     const int COLUMNS = 4;
 	float cardSpacingWidth = (WIDTH - 32.0f * 4.0f * 4.0f) / 5.0f; //Spacing between cards
     float cardSpacingHeight = (HEIGHT - 32.0f * 4.0f * 4.0f) / 5.0f;  //Spacing between cards
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
-	window->setFramerateLimit(60);
+    /*sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
+	window->setFramerateLimit(60);*/
+    sf::RenderWindow window(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
+    window.setFramerateLimit(60);
+    // ... use window as a normal object (with . instead of ->)
 
 	bool isPressed = false;
 
@@ -109,19 +112,19 @@ int main()
         }
     }
 
-    while (window->isOpen())
+    while (window.isOpen())
     {
-        while (const std::optional event = window->pollEvent())
+        while (const std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
             {
-                window->close();
+                window.close();
             }
             else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
             {
                 if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
                 {
-                    window->close();
+                    window.close();
                 }
             }
 
@@ -129,8 +132,8 @@ int main()
             {
                 if (!isPressed)
                 {
-					sf::Vector2i mousePos = sf::Mouse::getPosition(*window);
-					sf::Vector2f worldPos = window->mapPixelToCoords(mousePos);
+					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+					sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
 
                     for (auto& card : cards) {
                         if (card.sprite.getGlobalBounds().contains(worldPos)) {
@@ -150,18 +153,18 @@ int main()
         }
 
 		//Rendering code
-		window->clear(sf::Color(135, 206, 235)); //Sky blue color
+		window.clear(sf::Color(135, 206, 235)); //Sky blue color
 
 		//Drawing code would go here
-		window->draw(backgroundSprite);
+		window.draw(backgroundSprite);
 
         for (const auto& card : cards) {
-            window->draw(card.sprite);
+            window.draw(card.sprite);
         }
 
-		window->display();
+		window.display();
     }
 
-    delete window;
+    //delete window;
     return 0;
 }
