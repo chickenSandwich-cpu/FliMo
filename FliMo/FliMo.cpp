@@ -45,7 +45,16 @@ int main()
 	window->setFramerateLimit(60);*/
     sf::RenderWindow window(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
     window.setFramerateLimit(60);
-    // ... use window as a normal object (with . instead of ->)
+
+	sf::Image icon;
+    if (icon.loadFromFile("assets/icon.png"))
+    {
+        window.setIcon({ icon.getSize().x, icon.getSize().y }, icon.getPixelsPtr());
+    }
+    else
+    {
+        std::cerr << "Failed to load icon image." << std::endl;
+    }
 
 	bool isPressed = false;
 
