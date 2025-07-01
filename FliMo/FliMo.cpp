@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <random>
 #include <SFML/Graphics.hpp>
 
 class Card
@@ -94,15 +96,29 @@ int main()
         }
     }
 
+    // Before the card creation loop, build a vector of shuffled indices:
+    std::vector<int> cardTypeIndices;
+    for (int i = 0; i < 8; ++i)
+    {
+        cardTypeIndices.push_back(i);
+        cardTypeIndices.push_back(i); // Each type appears twice for a pair
+    }
+
+    // Shuffle the indices
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(cardTypeIndices.begin(), cardTypeIndices.end(), g);
+
     std::vector<Card> cards;
-    int textureId = 0;
+    int cardId = 0;
 
     for (int row = 0; row < ROWS; ++row)
     {
         for (int column = 0; column < COLUMNS; ++column)
         {
-            const sf::Texture& frontTexture = cardFrontTextures[textureId % cardFrontTextures.size()];
-            cards.emplace_back(cardBackTexture, frontTexture, textureId);
+			int cardTypeIdx = cardTypeIndices[row * COLUMNS + column];
+            const sf::Texture& frontTexture = cardFrontTextures[cardTypeIdx];
+            cards.emplace_back(cardBackTexture, frontTexture, cardTypeIdx);
 
             // Calculate position for this card
             float cardWidth = cardBackTexture.getSize().x * 4.0f;
@@ -115,7 +131,7 @@ int main()
             cards.back().sprite.setPosition({ x, y });
             cards.back().sprite.setScale({ 4.0f, 4.0f });
 
-            ++textureId;
+            ++cardId;
         }
     }
 
@@ -172,7 +188,7 @@ int main()
         {
             int idx1 = flippedIndices[0];
             int idx2 = flippedIndices[1];
-            if (cards[idx1].id % 8 == cards[idx2].id % 8) // or compare by texture or another identifier
+            if (cards[idx1].id == cards[idx2].id) // or compare by texture or another identifier
             {
                 // Match found
                 score += 1;
