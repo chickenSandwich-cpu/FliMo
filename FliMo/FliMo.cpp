@@ -39,14 +39,12 @@ int main()
     unsigned int HEIGHT = 960;
     const int ROWS = 4;
     const int COLUMNS = 4;
-	float cardSpacingWidth = (WIDTH - 32.0f * 4.0f * 4.0f) / 5.0f; //Spacing between cards
+    float cardSpacingWidth = (WIDTH - 32.0f * 4.0f * 4.0f) / 5.0f; //Spacing between cards
     float cardSpacingHeight = (HEIGHT - 32.0f * 4.0f * 4.0f) / 5.0f;  //Spacing between cards
-    /*sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
-	window->setFramerateLimit(60);*/
     sf::RenderWindow window(sf::VideoMode({ WIDTH, HEIGHT }), "FliMo");
     window.setFramerateLimit(60);
 
-	sf::Image icon;
+    sf::Image icon;
     if (icon.loadFromFile("assets/icon.png"))
     {
         window.setIcon({ icon.getSize().x, icon.getSize().y }, icon.getPixelsPtr());
@@ -56,24 +54,24 @@ int main()
         std::cerr << "Failed to load icon image." << std::endl;
     }
 
-	bool isPressed = false;
+    bool isPressed = false;
 
-	sf::Texture backgroundTexture;
+    sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("assets/paper_background.png"))
     {
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
     }
     sf::Sprite backgroundSprite(backgroundTexture);
-	//Load the background the size of the window
-	backgroundSprite.setScale({ static_cast<float>(WIDTH) / backgroundTexture.getSize().x,
+    //Load the background the size of the window
+    backgroundSprite.setScale({ static_cast<float>(WIDTH) / backgroundTexture.getSize().x,
         static_cast<float>(HEIGHT) / backgroundTexture.getSize().y });
     sf::Texture cardBackTexture;
     if (!cardBackTexture.loadFromFile("assets/card_back.png"))
     {
         std::cerr << "Failed to load texture!" << std::endl;
         return -1;
-	}
+    }
 
     std::vector<sf::Texture> cardFrontTextures(8);
     const char* textureFiles[8] = {
@@ -94,23 +92,23 @@ int main()
             std::cerr << "Failed to load texture: " << textureFiles[i] << std::endl;
             return -1;
         }
-	}
+    }
 
     std::vector<Card> cards;
-	int textureId = 0;
+    int textureId = 0;
 
     for (int row = 0; row < ROWS; ++row)
     {
         for (int column = 0; column < COLUMNS; ++column)
         {
-			const sf::Texture& frontTexture = cardFrontTextures[textureId % cardFrontTextures.size()];
+            const sf::Texture& frontTexture = cardFrontTextures[textureId % cardFrontTextures.size()];
             cards.emplace_back(cardBackTexture, frontTexture, textureId);
 
             // Calculate position for this card
             float cardWidth = cardBackTexture.getSize().x * 4.0f;
             float cardHeight = cardBackTexture.getSize().y * 4.0f;
             float startX = (WIDTH - 32.0f * 4.0f * 4.0f) / 5.0f;
-			float startY = (HEIGHT - 32.0f * 4.0f * 4.0f) / 5.0f;
+            float startY = (HEIGHT - 32.0f * 4.0f * 4.0f) / 5.0f;
             float x = startX + column * (cardWidth + cardSpacingWidth);
             float y = startY + row * (cardHeight + cardSpacingHeight);
 
@@ -120,6 +118,11 @@ int main()
             ++textureId;
         }
     }
+
+    std::vector<int> flippedIndices; // Indices of currently flipped cards
+    int score = 0;
+    sf::Clock flipClock;
+    bool waitingForFlipBack = false;
 
     while (window.isOpen())
     {
@@ -137,16 +140,19 @@ int main()
                 }
             }
 
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !waitingForFlipBack)
             {
                 if (!isPressed)
                 {
-					sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-					sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                    sf::Vector2f worldPos = window.mapPixelToCoords(mousePos);
 
-                    for (auto& card : cards) {
-                        if (card.sprite.getGlobalBounds().contains(worldPos)) {
+                    for (size_t i = 0; i < cards.size(); ++i) {
+                        Card& card = cards[i];
+                        if (!card.isFlipped && card.sprite.getGlobalBounds().contains(worldPos))
+                        {
                             card.Flip(cardBackTexture);
+                            flippedIndices.push_back(static_cast<int>(i));
                             std::cout << "Card flipped!" << std::endl;
                             break;
                         }
@@ -161,19 +167,50 @@ int main()
             }
         }
 
-		//Rendering code
-		window.clear(sf::Color(135, 206, 235)); //Sky blue color
+        // Handle matching logic
+        if (flippedIndices.size() == 2 && !waitingForFlipBack)
+        {
+            int idx1 = flippedIndices[0];
+            int idx2 = flippedIndices[1];
+            if (cards[idx1].id % 8 == cards[idx2].id % 8) // or compare by texture or another identifier
+            {
+                // Match found
+                score += 1;
+                flippedIndices.clear();
+                std::cout << "Match! Score: " << score << std::endl;
+            }
+            else
+            {
+                // No match, start timer to flip back
+                waitingForFlipBack = true;
+                flipClock.restart();
+            }
+        }
 
-		//Drawing code would go here
-		window.draw(backgroundSprite);
+        // Flip back after delay (e.g., 1 second)
+        if (waitingForFlipBack && flipClock.getElapsedTime().asSeconds() > 1.0f)
+        {
+            for (int idx : flippedIndices)
+            {
+                cards[idx].Flip(cardBackTexture);
+            }
+            flippedIndices.clear();
+            waitingForFlipBack = false;
+        }
 
-        for (const auto& card : cards) {
+        //Rendering code
+        window.clear(sf::Color(135, 206, 235)); //Sky blue color
+
+        //Drawing code would go here
+        window.draw(backgroundSprite);
+
+        for (const auto& card : cards)
+        {
             window.draw(card.sprite);
         }
 
-		window.display();
+        window.display();
     }
 
-    //delete window;
     return 0;
 }
